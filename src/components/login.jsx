@@ -1,41 +1,31 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-const Login = function () {
+const Login = function (props) {
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-    /* useEffect(() => {
-        fetch('http://localhost:3000/users')
-        .then(response => response.json())
-        .then(data => {
-            // Example: set the email from API response
-            console.log(data);
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error);
-        });
-    }, []); */
-
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Prevent default form submission
+        e.preventDefault();
 
         try {
-            const response = await fetch('http://localhost:3000/users/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, password })
-            });
-
-            const data = await response.json();
-            console.log(data); // Handle login response
-            alert('Login successful!');
-        } catch (error) {
-            alert('Error logging in');
+            axios.post('http://localhost:3000/users/login', {username: username, password: password})
+                .then(function(response){
+                    props.setCurrentUser(response.data)
+                    alert(`${response.data.username} logged in successfully`)
+                })
+                .catch(function(error){
+                    alert(error.message)
+                })
+                
         }
-    };
+        
+        catch(error){
+            console.log(props)
+            alert(error.message)
+        };
+    }
 
     return (
         <>
@@ -80,6 +70,7 @@ const Login = function () {
             </div>
         </>
     )
+
 }
 
 export default Login;
