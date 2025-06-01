@@ -5,6 +5,7 @@ import './index.css';
 import Login from './components/login';
 import Users from './components/users';
 import Logout from './components/logout';
+import Navbar from "./components/navBar"
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -25,6 +26,7 @@ function App() {
 
   return (
     <>
+    <Navbar />
       {currentUser ? <Logout setCurrentUser={setCurrentUser} /> : <Login currentUser={currentUser} setCurrentUser={setCurrentUser} />}
       
       <Users currentUser={currentUser} />
