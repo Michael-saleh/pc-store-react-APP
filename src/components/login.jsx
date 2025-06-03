@@ -1,76 +1,125 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const Login = function (props) {
+const Login = (props) => {
+    const navigate = useNavigate();
+    const [data, setData] = useState({ username: "", password: "" });
+    const [loginError, setLoginError] = useState(false);
 
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const handleChange = (e) => {
+        const { id, value } = e.target;
+        setData((prev) => ({
+            ...prev,
+            [id]: value
+        }));
+        setLoginError(false);
+    };
 
+    // Update handleSubmit to set loginError
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
-            axios.post('http://localhost:3000/users/login', {username: username, password: password})
-                .then(function(response){
-                    props.setCurrentUser(response.data)
-                    alert(`${response.data.username} logged in successfully`)
+            axios.post('http://localhost:3000/users/login', { username: data.username, password: data.password })
+                .then(function (response) {
+                    if (response.data._id) {
+                        props.setCurrentUser(response.data)
+                        props.createNote(`${response.data.username} logged in successfully`, "success");
+                        navigate('/users')
+                    } else {
+                        props.createNote("Invalid username or password", "fail");
+                        setLoginError(true);
+                    }
                 })
-                .catch(function(error){
-                    alert(error.message)
+                .catch(function (error) {
+                    props.createNote(error.message, "fail");
+                    setLoginError(true);
                 })
-                
         }
-        
-        catch(error){
-            console.log(props)
-            alert(error.message)
+        catch (error) {
+            props.createNote(error.message, "fail");
+            setLoginError(true);
         };
     }
 
     return (
         <>
-            <div className="modal modal-sheet position-static d-block bg-body-secondary p-4 py-md-5" tabIndex="-1" role="dialog" id="modalSignin">
-                <div className="modal-dialog">
-                    <div className="modal-content rounded-4 shadow">
-                        <div className="modal-header p-5 pb-4 border-bottom-0">
-                            <h1 className="fw-bold mb-0 fs-2">Log in</h1>
-                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div className="modal-body p-5 pt-0">
-                            <form className="" onSubmit={handleSubmit}>
-                                <div className="form-floating mb-3">
-                                    <input type="text" className="form-control rounded-3" id="floatingInput" placeholder="name@example.com" value={username} onChange={(e) => { setUsername(e.target.value) }} />
-                                    <label htmlFor="floatingInput">Email address</label>
-                                </div>
-                                <div className="form-floating mb-3">
-                                    <input type="password" className="form-control rounded-3" id="floatingPassword" placeholder="Password" value={password} onChange={(e) => { setPassword(e.target.value) }} />
-                                    <label htmlFor="floatingPassword">Password</label>
-                                </div>
-                                <button className="w-100 mb-2 btn btn-lg rounded-3 btn-primary" type="submit">Log in</button>
-
-                                {/*<small className="text-body-secondary">By clicking Sign up, you agree to the terms of use.</small>
-                                <hr className="my-4" />
-                                <h2 className="fs-5 fw-bold mb-3">Or use a third-party</h2>
-                                <button className="w-100 py-2 mb-2 btn btn-outline-secondary rounded-3" type="submit">
-                                    <svg className="bi me-1" width="16" height="16" aria-hidden="true"><use xlinkHref="#google"></use></svg>
-                                        Sign up with Google
-                                </button>
-                                <button className="w-100 py-2 mb-2 btn btn-outline-primary rounded-3" type="submit">
-                                    <svg className="bi me-1" width="16" height="16" aria-hidden="true"><use xlinkHref="#facebook"></use></svg>
-                                        Sign up with Facebook
-                                </button>
-                                <button className="w-100 py-2 mb-2 btn btn-outline-secondary rounded-3" type="submit">
-                                    <svg className="bi me-1" width="16" height="16" aria-hidden="true"><use xlinkHref="#github"></use></svg>
-                                        Sign up with GitHub
-                                </button> */}
-                            </form>
+            <div className="row" style={{ marginTop: "30px", display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}>
+                <h1 className="center-align  blue-text text-darken-3" style={{ marginTop: "40px" }}>Login</h1>
+                <form
+                    className="col s12 z-depth-2 white"
+                    style={{
+                        padding: "32px",
+                        borderRadius: "12px",
+                        width: "50vw",
+                        minWidth: "320px",
+                        maxWidth: "600px",
+                        margin: "0 auto",
+                        maxWidth: "300px"
+                    }}
+                    onSubmit={handleSubmit}
+                >
+                    <div className="row">
+                        <div className="input-field col s12" style={loginError ? { position: "relative" } : {}}>
+                            <input
+                                placeholder="Username"
+                                id="username"
+                                type="text"
+                                className={`validate ${loginError ? "invalid" : ""}`}
+                                onChange={handleChange}
+                                value={data.username}
+                                style={loginError ? { borderColor: "red" } : {}}
+                            />
+                            {loginError && (
+                                <span style={{
+                                    color: "red",
+                                    position: "absolute",
+                                    right: "10px",
+                                    top: "10px",
+                                    fontWeight: "bold",
+                                    fontSize: "1.2rem"
+                                }}>!</span>
+                            )}
                         </div>
                     </div>
-                </div>
+                    <div className="row">
+                        <div className="input-field col s12" style={loginError ? { position: "relative" } : {}}>
+                            <input
+                                placeholder="Password"
+                                id="password"
+                                type="password"
+                                className={`validate ${loginError ? "invalid" : ""}`}
+                                onChange={handleChange}
+                                value={data.password}
+                                style={loginError ? { borderColor: "red" } : {}}
+                            />
+                            {loginError && (
+                                <span style={{
+                                    color: "red",
+                                    position: "absolute",
+                                    right: "10px",
+                                    top: "10px",
+                                    fontWeight: "bold",
+                                    fontSize: "1.2rem"
+                                }}>!</span>
+                            )}
+                        </div>
+                    </div>
+                    <div className="row" style={{ marginTop: "24px" }}>
+                        <div className="col s12 center-align">
+                            <button type="submit" className="waves-effect waves-light blue darken-3 btn-small z-depth-5" style={{ marginRight: "16px" }} disabled={!data.username || data.password.length < 8}>
+                                Login
+                            </button>
+                            <div style={{ fontSize: "1.1rem" }}>
+                                Don't have an account? <Link className="blue-text text-darken-2" to="/signup">Register</Link>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
         </>
-    )
-
-}
+    );
+};
 
 export default Login;
