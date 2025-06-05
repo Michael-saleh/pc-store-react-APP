@@ -8,6 +8,8 @@ import Users from './components/users';
 import Signup from './components/signup';
 import Navbar from "./components/navBar";
 import Note from "./components/note";
+import Home from "./components/home";
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -48,7 +50,7 @@ function App() {
         <Note createNote={createNote} removeNote={removeNote} note={note} />
 
         <Routes>
-          <Route path="/" element={!currentUser && <Login currentUser={currentUser} setCurrentUser={setCurrentUser} />} />
+          <Route path="/" element={!currentUser ? <Login currentUser={currentUser} setCurrentUser={setCurrentUser} /> : <Home />} />
           <Route path="/login" element={<Login currentUser={currentUser} setCurrentUser={setCurrentUser} createNote={createNote} />} />
           <Route path="/signup" element={<Signup />} createNote={createNote} />
           <Route path="/users" element={<Users currentUser={currentUser} setCurrentUser={setCurrentUser} createNote={createNote} />} />

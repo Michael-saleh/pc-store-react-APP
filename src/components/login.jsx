@@ -26,7 +26,7 @@ const Login = (props) => {
                     if (response.data._id) {
                         props.setCurrentUser(response.data)
                         props.createNote(`${response.data.username} logged in successfully`, "success");
-                        navigate('/users')
+                        navigate('/')
                     } else {
                         props.createNote("Invalid username or password", "fail");
                         setLoginError(true);
@@ -53,10 +53,9 @@ const Login = (props) => {
                         padding: "32px",
                         borderRadius: "12px",
                         width: "50vw",
-                        minWidth: "320px",
-                        maxWidth: "600px",
-                        margin: "0 auto",
-                        maxWidth: "300px"
+                        minWidth: "380px",
+                        maxWidth: "500px",
+                        margin: "0 auto"
                     }}
                     onSubmit={handleSubmit}
                 >
