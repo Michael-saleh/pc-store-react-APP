@@ -50,7 +50,7 @@ function App() {
         <Note createNote={createNote} removeNote={removeNote} note={note} />
 
         <Routes>
-          <Route path="/" element={!currentUser ? <Login currentUser={currentUser} setCurrentUser={setCurrentUser} /> : <Home />} />
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login currentUser={currentUser} setCurrentUser={setCurrentUser} createNote={createNote} />} />
           <Route path="/signup" element={<Signup />} createNote={createNote} />
           <Route path="/users" element={<Users currentUser={currentUser} setCurrentUser={setCurrentUser} createNote={createNote} />} />
