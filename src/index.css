@@ -78,3 +78,7 @@
 .bd-mode-toggle .dropdown-menu .active .bi {
     display: block !important
 }
+
+.sidenav-overlay {
+    z-index: 0;
+}

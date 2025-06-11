@@ -1,10 +1,14 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate } from 'react-router-dom';
-import axios from "axios";
+import { useSelector, useDispatch } from "react-redux";
+import { logoutUser } from "../app/features/usersSlice";
+import { createNote } from "../app/features/noteSlice";
 
-const Navbar = (props) => {
+const Navbar = () => {
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const currentUser = useSelector((state) => state.users.currentUser)
 
     useEffect(() => {
         // Initialize Materialize sidenav
@@ -14,22 +18,24 @@ const Navbar = (props) => {
         }
     }, []);
 
-    const handleLogout = () => {
-        try {
-            axios.post("http://localhost:3000/users/logout")
-                .then(function (response) {
-                    props.setCurrentUser(null)
-                    navigate('/login')
-                    props.createNote("Logged out successfully", "success");
-                })
-                .catch(function (error) {
-                    console.log(error.message)
-                    props.createNote("error logging out", "fail");
-                })
+    // closes sidenav when a button is clicked, or when clicking outside of it
+    const closeSidenav = () => {
+        const sidenav = document.querySelector('.sidenav');
+        if (window.M && sidenav) {
+            const instance = window.M.Sidenav.getInstance(sidenav);
+            if (instance) instance.close();
         }
-        catch (err) {
+    };
+
+    const handleLogout = async () => {
+        try {
+            await dispatch(logoutUser()); // Wait for logout to complete
+            closeSidenav();
+            navigate('/login'); // Navigate to the login page after logout
+            dispatch(createNote(["Logged out successfully", "success"]));
+        } catch (err) {
             console.log(err.message);
-            props.createNote("error logging out", "fail");
+            dispatch(createNote(["error logging out", "fail"]));
         }
     }
 
@@ -42,9 +48,10 @@ const Navbar = (props) => {
                         <i className="material-icons">Menu</i>
                     </Link>
                     <ul id="nav-mobile" className="right hide-on-med-and-down">
-                        <li>
+                        {currentUser && currentUser.isAdmin && <li>
                             <Link to="/users" className="modern-link" style={{ textDecoration: "none" }}>Users</Link>
-                        </li>
+                        </li>}
+
                         <li>
                             <Link to="/products" className="modern-link" style={{ textDecoration: "none" }}>Products</Link>
                         </li>
@@ -52,8 +59,8 @@ const Navbar = (props) => {
                             <Link to="/orders" className="modern-link" style={{ textDecoration: "none" }}>Orders</Link>
                         </li>
                         <li>
-                            {props.currentUser ? (
-                                <Link onClick={handleLogout} className="modern-link" style={{ textDecoration: "none" }}>Log out</Link>
+                            {currentUser ? (
+                                <Link onClick={() => handleLogout()} className="modern-link" style={{ textDecoration: "none" }}>Log out</Link>
                             ) : (
                                 <span className="modern-link" style={{ textDecoration: "none", display: "flex" }}><Link to="/login">Login</Link><span>/</span><Link to="/signup">signup</Link></span>
                             )}
@@ -61,25 +68,25 @@ const Navbar = (props) => {
                     </ul>
                     <ul className="sidenav" id="mobile-demo">
                         <li>
-                            <Link to="/" className="modern-link" style={{ textDecoration: "none" }}>Home</Link>
+                            <Link to="/" className="modern-link" style={{ textDecoration: "none" }} onClick={closeSidenav}>Home</Link>
                         </li>
                         <hr style={{ width: "40%", color: "black" }} />
+                        {currentUser && currentUser.isAdmin && <li>
+                            <Link to="/users" className="modern-link" style={{ textDecoration: "none" }} onClick={closeSidenav}>Users</Link>
+                        </li>}
                         <li>
-                            <Link to="/users" className="modern-link" style={{ textDecoration: "none" }}>Users</Link>
+                            <Link to="/products" className="modern-link" style={{ textDecoration: "none" }} onClick={closeSidenav}>Products</Link>
                         </li>
                         <li>
-                            <Link to="/products" className="modern-link" style={{ textDecoration: "none" }}>Products</Link>
+                            <Link to="/orders" className="modern-link" style={{ textDecoration: "none" }} onClick={closeSidenav}>Orders</Link>
                         </li>
                         <li>
-                            <Link to="/orders" className="modern-link" style={{ textDecoration: "none" }}>Orders</Link>
-                        </li>
-                        <li>
-                            {props.currentUser ? (
+                            {currentUser ? (
                                 <Link onClick={handleLogout} className="modern-link" style={{ textDecoration: "none" }}>Log out</Link>
                             ) : (
                                 <>
-                                    <Link to="/login" className="modern-link" style={{ textDecoration: "none" }}>Login</Link>
-                                    <Link to="/signup" className="modern-link" style={{ textDecoration: "none" }}>signup</Link>
+                                    <Link to="/login" className="modern-link" style={{ textDecoration: "none" }} onClick={closeSidenav}>Login</Link>
+                                    <Link to="/signup" className="modern-link" style={{ textDecoration: "none" }} onClick={closeSidenav}>signup</Link>
                                 </>
                             )}
                         </li>

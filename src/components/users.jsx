@@ -1,49 +1,64 @@
-import React, { useState, useEffect } from 'react';
-import User from './user'
-import axios from 'axios';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from "react-redux";
+import { getUsers, deleteUser } from "../app/features/usersSlice";
+import { createNote } from "../app/features/noteSlice"
 
-const Users = (props) => {
+const Users = () => {
 
-    const [users, setUsers] = useState([]);
-    const handleDelete = (id) => {
-        axios.delete(`http://localhost:3000/users/${id}`)
-            .then(function (response) {
-                // Remove the deleted user from the state
-                if (response.data !== "Not authorized") {
-                    if (props.currentUser._id === response.data._id) {
-                        props.setCurrentUser(null);
-                    }
-                    setUsers(prevUsers => prevUsers.filter(user => user._id !== id));
+    const dispatch = useDispatch();
+    const currentUser = useSelector((state) => state.users.currentUser);
+    const status = useSelector((state) => state.users.status);
+    const error = useSelector((state) => state.users.error);
+    const users = useSelector((state) => state.users.data);
 
-                } else {
-                    props.createNote("Not Authorized", "fail")
-                }
+    const handleDelete = async (id) => {
+        if (currentUser && (currentUser._id == id || currentUser.isAdmin == true)) {
+            await dispatch(deleteUser(id));
+            dispatch(createNote(["user deleted successfully", "success"]));
+            dispatch(getUsers());
+        } else {
+            dispatch(createNote(["user delete failed, action not authorized", "fail"]));
+        }
 
-            })
-            .catch(function (error) {
-                console.log(error.message);
-                alert(error.message);
-            });
     };
 
+    useEffect(() => {
+        dispatch(getUsers());
+    }, []);
 
     useEffect(() => {
-        axios.get('http://localhost:3000/users')
-            .then(function (response) {
-                setUsers(response.data);
-            })
-            .catch(function (error) {
-                console.log(error.message);
-                alert(error.message)
-            });
-
-
-    }, [])
+        if (status === 'idle') {
+            dispatch(getUsers());
+        }
+    }, [status, dispatch]);
 
     return (
         <>
             {users.map(user => {
-                return <User username={user.username} id={user._id} key={user._id} firstName={user.firstName} lastName={user.lastName} gender={user.gender} birthYear={user.birthYear} email={user.email} handleDelete={handleDelete} />
+                return (
+                    <div
+                        key={user._id}
+                        className={user.isAdmin ? "card yellow darken-2" : "card blue darken-3"}
+                        style={{ maxWidth: "300px" }}
+                    >
+                        <div className={`card-content ${user.isAdmin ? "black-text text-darken-3" : "white-text"}`}>
+                            <span className="card-title" style={{ fontWeight: "bold" }}>{user.username}</span>
+                            <p>First Name : {user.firstName}</p>
+                            <p>Last Name : {user.lastName}</p>
+                            <p>Birth Year : {user.birthYear}</p>
+                            <p>Gender : {user.gender}</p>
+                            <p>Email : {user.email}</p>
+                        </div>
+                        <div className="card-action">
+                            <button
+                                className="btn red lighten-1 waves-effect waves-light"
+                                onClick={() => { handleDelete(user._id) }}
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                )
             })}
         </>
     )

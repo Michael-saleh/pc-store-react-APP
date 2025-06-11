@@ -1,10 +1,17 @@
 import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { removeNote } from "../app/features/noteSlice"
 
-function Note(props) {
+function Note() {
+
+    const dispatch = useDispatch();
+    const note = useSelector((state) => state.note.message)
+
     return (
         <>
-            {props.note && props.note.length !== 0 && (
+            {note && note.length !== 0 && (
                 <div
+                    onClick={() => dispatch(removeNote())}
                     style={{
                         position: "fixed",
                         top: "65px",
@@ -14,23 +21,23 @@ function Note(props) {
                         display: "flex",
                         justifyContent: "center",
                         width: "100%",
-                        pointerEvents: "none"
+                        // pointerEvents: "none"
                     }}
                 >
                     <div
                         className={
                             "alert text-center " +
-                            (props.note[1] === "success" ? "green" : "red")
+                            (note[1] === "success" ? "green" : "red")
                         }
                         role="alert"
-                        onClick={props.removeNote}
+
                         style={{
                             opacity: 0.9,
                             pointerEvents: "auto",
                             minWidth: "250px"
                         }}
                     >
-                        {props.note[0]}
+                        {note[0]}
                     </div>
                 </div>
             )}

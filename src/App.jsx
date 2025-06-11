@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
-import axios from "axios";
-import { BrowserRouter, Routes, Route } from 'react-router';
-import './App.css';
-import './index.css';
+import { useEffect } from 'react';
+import { Routes, Route } from 'react-router';
+import { useSelector, useDispatch } from "react-redux";
+import { useLocation } from "react-router-dom";
+import { createNote } from "./app/features/noteSlice";
+/* import './App.css';
+import './index.css'; */
 import Login from './components/login';
 import Users from './components/users';
 import Signup from './components/signup';
@@ -16,50 +18,34 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 
 function App() {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [note, setNote] = useState([]);
+  const location = useLocation();
+  const dispatch = useDispatch();
+  const currentUser = useSelector((state) => state.users.currentUser);
 
-  const createNote = (message, condition) => {
-    setNote([message, condition]);
-    setTimeout(() => {
-      setNote([])
-    }, 3000)
-  }
-
-  const removeNote = () => {
-    setNote([]);
-  };
 
 
 
   useEffect(() => {
-    axios.get("http://localhost:3000/users/currentUser")
-      .then(function (response) {
-        setCurrentUser(response.data)
-      })
-      .catch(function (error) {
-        console.log(error)
-      })
-  }, [])
+    if (!(currentUser && currentUser.isAdmin) && location.pathname === '/users') {
+      dispatch(createNote(["Login as admin to access this page", "fail"]));
+    }
+  }, [location.pathname]);
 
 
   return (
     <>
-      <BrowserRouter>
-        <Navbar currentUser={currentUser} setCurrentUser={setCurrentUser} createNote={createNote} />
-        <Note createNote={createNote} removeNote={removeNote} note={note} />
 
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login currentUser={currentUser} setCurrentUser={setCurrentUser} createNote={createNote} />} />
-          <Route path="/signup" element={<Signup />} createNote={createNote} />
-          <Route path="/users" element={<Users currentUser={currentUser} setCurrentUser={setCurrentUser} createNote={createNote} />} />
+      <Navbar />
+      <Note />
 
-        </Routes>
-      </BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/users" element={currentUser && currentUser.isAdmin ? (<Users />) : (<Login />)} />
+      </Routes>
     </>
   )
 }
 
 export default App;
-

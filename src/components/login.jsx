@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useDispatch } from "react-redux";
+import { loginUser } from "../app/features/usersSlice";
+import { createNote } from "../app/features/noteSlice";
 
-const Login = (props) => {
+const Login = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [data, setData] = useState({ username: "", password: "" });
     const [loginError, setLoginError] = useState(false);
 
@@ -16,29 +19,26 @@ const Login = (props) => {
         setLoginError(false);
     };
 
-    // Update handleSubmit to set loginError
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
-            axios.post('http://localhost:3000/users/login', { username: data.username, password: data.password })
+            dispatch(loginUser({ username: data.username, password: data.password }))
                 .then(function (response) {
-                    if (response.data._id) {
-                        props.setCurrentUser(response.data)
-                        props.createNote(`${response.data.username} logged in successfully`, "success");
-                        navigate('/')
+                    if (response.error) {
+                        dispatch(createNote([response.payload, "fail"]))
                     } else {
-                        props.createNote("Invalid username or password", "fail");
-                        setLoginError(true);
+                        dispatch(createNote([`logged in as ${response.payload.username}`, "success"]))
+                        navigate("/")
                     }
+
                 })
                 .catch(function (error) {
-                    props.createNote(error.message, "fail");
-                    setLoginError(true);
+                    dispatch(createNote(["error logging in", "fail"]))
                 })
         }
         catch (error) {
-            props.createNote(error.message, "fail");
+            dispatch(createNote([error.message, "fail"]))
             setLoginError(true);
         };
     }
