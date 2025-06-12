@@ -9,7 +9,7 @@ import { store } from './app/store';
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
+      <BrowserRouter basename="/pc-store-react-build">
         <App />
       </BrowserRouter>
 
