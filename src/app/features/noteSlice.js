@@ -7,6 +7,7 @@ const noteSlice = createSlice({
     },
     reducers: {
         makeNote: (state, action) => {
+            console.log(action);
             state.message = action.payload;
         },
         removeNote: (state) => {

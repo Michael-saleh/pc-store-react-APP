@@ -1,20 +1,25 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from "axios";
 
+const data_API = import.meta.env.VITE_data_API;
 
 export const getUsers = createAsyncThunk("users/getUsers", async () => {
-    const response = await axios.get("http://localhost:3000/users");
+    const response = await axios.get(`${data_API}/users`);
+    console.log(response)
     return response.data;
 })
 
 export const loginUser = createAsyncThunk("users/loginUser", async (user, { rejectWithValue }) => {
     try {
-        const response = await axios.post("http://localhost:3000/users/login", user);
+        const response = await axios.post(`${data_API}/users/login`, user);
+        console.log(response)
         return response.data;
+        
     } catch (error) {
         if (!error.response) {
             return rejectWithValue("Network error. Please try again.");
         }
+        console.log(error)
         return rejectWithValue(error.response.data.message || "Login failed.");
     }
 
@@ -23,7 +28,7 @@ export const loginUser = createAsyncThunk("users/loginUser", async (user, { reje
 export const postUser = createAsyncThunk("users/postUser",
     async (newUser, { rejectWithValue }) => {
         try {
-            const response = await axios.post("http://localhost:3000/users", newUser);
+            const response = await axios.post(`${data_API}/users`, newUser);
             return response.data;
         } catch (error) {
             // Handle both network errors and HTTP errors
@@ -36,7 +41,7 @@ export const postUser = createAsyncThunk("users/postUser",
 );
 
 export const deleteUser = createAsyncThunk("users/deleteUser", async (id) => {
-    const response = await axios.delete(`http://localhost:3000/users/${id}`);
+    const response = await axios.delete(`${data_API}/users/${id}`);
     return response.data;
 })
 
@@ -54,7 +59,8 @@ const usersSlice = createSlice({
     reducers: {
         logoutUser: (state) => {
             state.currentUser = null;
-            return state;
+            state.token = null;
+            return state; // !!! ???
         }
     },
 
@@ -78,6 +84,7 @@ const usersSlice = createSlice({
         builder
             .addCase(loginUser.pending, (state) => {
                 state.status = 'logging in';
+                state.error = null;
             })
             .addCase(loginUser.fulfilled, (state, action) => {
                 state.status = 'Succeeded';

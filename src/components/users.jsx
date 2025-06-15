@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from "react-redux";
-import { getUsers, deleteUser } from "../app/features/usersSlice";
-import { createNote } from "../app/features/noteSlice"
+import { getUsers, deleteUser } from "../App/features/usersSlice";
+import { createNote } from "../App/features/noteSlice"
 
 const Users = () => {
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { removeNote } from "../app/features/noteSlice"
+import { removeNote } from "../App/features/noteSlice"
 
 function Note() {
 

@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
-import { logoutUser } from "../app/features/usersSlice";
-import { createNote } from "../app/features/noteSlice";
+import { logoutUser } from "../App/features/usersSlice";
+import { createNote } from "../App/features/noteSlice";
 
 const Navbar = () => {
 

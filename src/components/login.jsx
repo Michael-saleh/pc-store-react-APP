@@ -1,34 +1,32 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { loginUser } from "../app/features/usersSlice";
-import { createNote } from "../app/features/noteSlice";
+import { useSelector, useDispatch } from "react-redux";
+import { loginUser } from "../App/features/usersSlice";
+import { createNote } from "../App/features/noteSlice";
 
 const Login = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [data, setData] = useState({ username: "", password: "" });
-    const [loginError, setLoginError] = useState(false);
+    // const [loginError, setLoginError] = useState(false);
+    const { status, error } = useSelector(state => state.users);
 
     const handleChange = (e) => {
         const { id, value } = e.target;
-        setData((prev) => ({
-            ...prev,
-            [id]: value
-        }));
-        setLoginError(false);
+        setData((prev) => ({ ...prev, [id]: value }));
+        // setLoginError(false);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        // dispatch(loginUser(data));
         try {
-            dispatch(loginUser({ username: data.username, password: data.password }))
+            dispatch(loginUser(data))
                 .then(function (response) {
                     if (response.error) {
                         dispatch(createNote([response.payload, "fail"]))
                     } else {
-                        dispatch(createNote([`logged in as ${response.payload.username}`, "success"]))
+                        dispatch(createNote([`logged in as ${response.payload.user.username}`, "success"]))
                         navigate("/")
                     }
 
@@ -47,6 +45,7 @@ const Login = () => {
         <>
             <div className="row" style={{ marginTop: "30px", display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}>
                 <h1 className="center-align  blue-text text-darken-3" style={{ marginTop: "40px" }}>Login</h1>
+
                 <form
                     className="col s12 z-depth-2 white"
                     style={{
@@ -59,18 +58,20 @@ const Login = () => {
                     }}
                     onSubmit={handleSubmit}
                 >
+                    {status === 'logging in' && <p>Logging in...</p>}
+                    {error && <p style={{ color: 'red' }}>{error}</p>}
                     <div className="row">
-                        <div className="input-field col s12" style={loginError ? { position: "relative" } : {}}>
+                        <div className="input-field col s12" style={error ? { position: "relative" } : {}}>
                             <input
                                 placeholder="Username"
                                 id="username"
                                 type="text"
-                                className={`validate ${loginError ? "invalid" : ""}`}
+                                className={`validate ${error ? "invalid" : ""}`}
                                 onChange={handleChange}
                                 value={data.username}
-                                style={loginError ? { borderColor: "red" } : {}}
+                                style={error ? { borderColor: "red" } : {}}
                             />
-                            {loginError && (
+                            {error && (
                                 <span style={{
                                     color: "red",
                                     position: "absolute",
@@ -83,17 +84,17 @@ const Login = () => {
                         </div>
                     </div>
                     <div className="row">
-                        <div className="input-field col s12" style={loginError ? { position: "relative" } : {}}>
+                        <div className="input-field col s12" style={error ? { position: "relative" } : {}}>
                             <input
                                 placeholder="Password"
                                 id="password"
                                 type="password"
-                                className={`validate ${loginError ? "invalid" : ""}`}
+                                className={`validate ${error ? "invalid" : ""}`}
                                 onChange={handleChange}
                                 value={data.password}
-                                style={loginError ? { borderColor: "red" } : {}}
+                                style={error ? { borderColor: "red" } : {}}
                             />
-                            {loginError && (
+                            {error && (
                                 <span style={{
                                     color: "red",
                                     position: "absolute",
