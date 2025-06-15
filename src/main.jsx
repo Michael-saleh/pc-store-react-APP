@@ -9,7 +9,7 @@ import { store } from './App/store';
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>
-      <BrowserRouter basename="/">
+      <BrowserRouter basename="/pc-store">
         <App />
       </BrowserRouter>
 
