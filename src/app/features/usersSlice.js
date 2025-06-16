@@ -2,8 +2,8 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from "axios";
 import { useSelector } from 'react-redux';
 
-// const data_API = import.meta.env.VITE_data_API;
-const data_API = "http://localhost:3000";
+const data_API = import.meta.env.VITE_data_API;
+// const data_API = "http://localhost:3000";
 
 export const getUsers = createAsyncThunk("users/getUsers", async (__, { rejectWithValue }) => {
     try {
