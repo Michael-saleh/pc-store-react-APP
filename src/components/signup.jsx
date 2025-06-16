@@ -1,14 +1,18 @@
 import React from "react";
 import { useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from "react-redux";
-import { postUser } from "../App/features/usersSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { postUser, resetError } from "../App/features/usersSlice";
 import { createNote } from "../App/features/noteSlice";
 
 const SignUp = () => {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    const error = useSelector((state) => state.users.error);
+
+    const [formErrors, setFormErrors] = useState({});
 
     const initialData = {
         username: "",
@@ -28,6 +32,7 @@ const SignUp = () => {
             ...prev,
             [id]: value
         }));
+        error && dispatch(resetError());
     };
 
     const handleSubmit = async (e) => {
@@ -36,11 +41,17 @@ const SignUp = () => {
             dispatch(postUser(data))
                 .then(function (response) {
                     if (response.error) {
+                        Object.keys(initialData).forEach(key => {
+                            if (response.payload.includes(key)) {
+                                setFormErrors(prev => ({ ...prev, [key]: true }))
+                            }
+                        })
+                        console.log(formErrors)
+                        // response.payload.includes("birthYear") && console.log("bingo")
                         dispatch(createNote(["Error creating user", "fail"]));
                     } else {
                         setData(initialData);
                         dispatch(createNote(["User registered successfully!!", "success"]));
-                        console.log(data)
                         navigate("/login");
                     }
 
@@ -56,7 +67,7 @@ const SignUp = () => {
 
 
     // List of required fields
-    const requiredFields = ["firstName", "lastName", "username", "password", "email"];
+    const requiredFields = ["firstName", "lastName", "username", "password", "email", "birthYear"];
 
     // Check if all required fields are filled
     // const isFormValid = requiredFields.every(field => data[field].trim() !== "");
@@ -75,6 +86,7 @@ const SignUp = () => {
 
     return (
         <>
+            {error && <p style={{ color: 'red' }}>Please fix wrong entries.</p>}
             <h1 className="center-align blue-text text-darken-3" style={{ marginTop: "40px" }}>Register</h1>
             <div className="row" style={{ marginTop: "30px", display: "flex", justifyContent: "center", alignItems: "center", minHeight: "70vh" }}>
                 <form
@@ -155,10 +167,15 @@ const SignUp = () => {
                                 placeholder="Year of birth"
                                 id="birthYear"
                                 type="text"
-                                className="validate"
+                                className={`validate ${submitted && isFieldMissing("birthYear") ? "invalid" : ""}`}
+                                // {`validate ${submitted && isFieldMissing("birthYear") ? "invalid" : ""}`}
+                                // (formErrors.birthYear == true || (submitted && isFieldMissing("birthYear"))) ? "validate invalid" : "validate"
                                 onChange={handleChange}
                                 value={data.birthYear}
                             />
+                            <span className={`helper-text${submitted && isFieldMissing("birthYear") ? " red-text" : ""}`}>
+                                Required
+                            </span>
                         </div>
                     </div>
                     <div className="row">

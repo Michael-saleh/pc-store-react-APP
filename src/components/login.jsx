@@ -1,25 +1,23 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { loginUser } from "../App/features/usersSlice";
+import { loginUser, resetError } from "../App/features/usersSlice";
 import { createNote } from "../App/features/noteSlice";
 
 const Login = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [data, setData] = useState({ username: "", password: "" });
-    // const [loginError, setLoginError] = useState(false);
     const { status, error } = useSelector(state => state.users);
 
     const handleChange = (e) => {
         const { id, value } = e.target;
         setData((prev) => ({ ...prev, [id]: value }));
-        // setLoginError(false);
+        error && dispatch(resetError());
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // dispatch(loginUser(data));
         try {
             dispatch(loginUser(data))
                 .then(function (response) {

@@ -1,21 +1,24 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from "react-redux";
-import { getUsers, deleteUser } from "../App/features/usersSlice";
+import { useNavigate } from "react-router-dom";
+import { getUsers, deleteUser, logoutUser } from "../App/features/usersSlice";
 import { createNote } from "../App/features/noteSlice"
 
 const Users = () => {
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const currentUser = useSelector((state) => state.users.currentUser);
     const status = useSelector((state) => state.users.status);
     const error = useSelector((state) => state.users.error);
     const users = useSelector((state) => state.users.data);
 
     const handleDelete = async (id) => {
-        if (currentUser && (currentUser._id == id || currentUser.isAdmin == true)) {
+        if (currentUser && (currentUser.id == id || currentUser.isAdmin == true)) {
             await dispatch(deleteUser(id));
             dispatch(createNote(["user deleted successfully", "success"]));
             dispatch(getUsers());
+            currentUser.id == id && dispatch(logoutUser()) && navigate('/login')
         } else {
             dispatch(createNote(["user delete failed, action not authorized", "fail"]));
         }
@@ -34,6 +37,7 @@ const Users = () => {
 
     return (
         <>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
             {users.map(user => {
                 return (
                     <div
@@ -52,7 +56,7 @@ const Users = () => {
                         <div className="card-action">
                             <button
                                 className="btn red lighten-1 waves-effect waves-light"
-                                onClick={() => { handleDelete(user._id) }}
+                                onClick={() => { confirm(`Are you sure you want to detele ${user.username}?`) && handleDelete(user._id) }}
                             >
                                 Delete
                             </button>

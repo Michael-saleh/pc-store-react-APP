@@ -42,7 +42,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/users" element={currentUser && currentUser.isAdmin ? (<Users />) : (<Login />)} />
+        <Route path="/users" element={(currentUser && currentUser.isAdmin) ? (<Users />) : (<Login />)} />
       </Routes>
     </>
   )
