@@ -2,8 +2,8 @@ import React from "react";
 import { useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
-import { postUser, resetError } from "../App/features/usersSlice";
-import { createNote } from "../App/features/noteSlice";
+import { postUser, resetError } from "../app/features/usersSlice";
+import { createNote } from "../app/features/noteSlice";
 
 const SignUp = () => {
 

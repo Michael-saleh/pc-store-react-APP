@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { loginUser, resetError } from "../App/features/usersSlice";
-import { createNote } from "../App/features/noteSlice";
+import { loginUser, resetError } from "../app/features/usersSlice";
+import { createNote } from "../app/features/noteSlice";
 
 const Login = () => {
     const navigate = useNavigate();
