@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Routes, Route } from 'react-router';
 import { useSelector, useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { createNote } from "./App/features/noteSlice";
+import { createNote } from "./app/features/noteSlice";
 /* import './App.css';
 import './index.css'; */
 import Login from './components/login';
