@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from "axios";
-import { useSelector } from 'react-redux';
+
 
 const data_API = import.meta.env.VITE_data_API;
 
@@ -45,18 +45,23 @@ export const postUser = createAsyncThunk("users/postUser",
 export const deleteUser = createAsyncThunk("users/deleteUser",
     async (id, { rejectWithValue }) => {
         const token = localStorage.getItem("token");
+        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-        try {
-            const response = await axios.delete(`${data_API}/users/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            return response.data;
-        } catch (error) {
+        if (currentUser && (currentUser.id == id || currentUser.isAdmin === true)) {
+            try {
+                const response = await axios.delete(`${data_API}/users/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                return response.data;
+            } catch (error) {
+                return rejectWithValue(error.response.data.message || "Delete failed");
+            }
+        } else {
             return rejectWithValue(error.response.data.message || "Delete failed");
         }
+
     }
 );
 

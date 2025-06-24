@@ -8,31 +8,28 @@ const Users = () => {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const currentUser = useSelector((state) => state.users.currentUser);
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
     const status = useSelector((state) => state.users.status);
     const error = useSelector((state) => state.users.error);
     const users = useSelector((state) => state.users.data);
 
     const handleDelete = async (id) => {
-        if (currentUser && (currentUser.id == id || currentUser.isAdmin === true)) {
-            try {
-                const resultAction = await dispatch(deleteUser(id));
-                if (deleteUser.fulfilled.match(resultAction)) {
-                    dispatch(createNote(["user deleted successfully", "success"]));
-                    dispatch(getUsers());
-                    if (currentUser.id == id) {
-                        dispatch(logoutUser());
-                        navigate('/login');
-                    }
-                } else {
-                    dispatch(createNote(["user delete failed, action not authorized", "fail"]));
+        try {
+            const resultAction = await dispatch(deleteUser(id));
+            if (deleteUser.fulfilled.match(resultAction)) {
+                dispatch(createNote(["user deleted successfully", "success"]));
+                dispatch(getUsers());
+                if (currentUser.id == id) {
+                    dispatch(logoutUser());
+                    navigate('/login');
                 }
-            } catch (error) {
+            } else {
                 dispatch(createNote(["user delete failed, action not authorized", "fail"]));
             }
-        } else {
+        } catch (error) {
             dispatch(createNote(["user delete failed, action not authorized", "fail"]));
         }
+
     };
 
     useEffect(() => {
