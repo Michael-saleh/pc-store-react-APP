@@ -14,15 +14,25 @@ const Users = () => {
     const users = useSelector((state) => state.users.data);
 
     const handleDelete = async (id) => {
-        if (currentUser && (currentUser.id == id || currentUser.isAdmin == true)) {
-            await dispatch(deleteUser(id));
-            dispatch(createNote(["user deleted successfully", "success"]));
-            dispatch(getUsers());
-            currentUser.id == id && dispatch(logoutUser()) && navigate('/login')
+        if (currentUser && (currentUser.id == id || currentUser.isAdmin === true)) {
+            try {
+                const resultAction = await dispatch(deleteUser(id));
+                if (deleteUser.fulfilled.match(resultAction)) {
+                    dispatch(createNote(["user deleted successfully", "success"]));
+                    dispatch(getUsers());
+                    if (currentUser.id == id) {
+                        dispatch(logoutUser());
+                        navigate('/login');
+                    }
+                } else {
+                    dispatch(createNote(["user delete failed, action not authorized", "fail"]));
+                }
+            } catch (error) {
+                dispatch(createNote(["user delete failed, action not authorized", "fail"]));
+            }
         } else {
             dispatch(createNote(["user delete failed, action not authorized", "fail"]));
         }
-
     };
 
     useEffect(() => {

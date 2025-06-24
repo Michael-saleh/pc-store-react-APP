@@ -12,8 +12,6 @@ const SignUp = () => {
 
     const error = useSelector((state) => state.users.error);
 
-    const [formErrors, setFormErrors] = useState({});
-
     const initialData = {
         username: "",
         firstName: "",
@@ -24,15 +22,13 @@ const SignUp = () => {
         gender: ""
     }
 
-    const [data, setData] = useState(initialData)
+    const [data, setData] = useState(initialData);
+    const [formErrors, setFormErrors] = useState({});
 
     const handleChange = (e) => {
         const { id, value } = e.target;
-        setData((prev) => ({
-            ...prev,
-            [id]: value
-        }));
-        error && dispatch(resetError());
+        setData((prev) => ({ ...prev, [id]: value }));
+        error && dispatch(resetError()); // Reset the error state when the user starts to edit the value
     };
 
     const handleSubmit = async (e) => {
@@ -43,12 +39,11 @@ const SignUp = () => {
                     if (response.error) {
                         Object.keys(initialData).forEach(key => {
                             if (response.payload.includes(key)) {
-                                setFormErrors(prev => ({ ...prev, [key]: true }))
+                                setFormErrors(prev => ({ ...prev, [key]: true })); // Change only the fields that contains an error inside the formError pbject
+                                setData(prev => ({ ...prev, [key]: "" })); // Reset the fields that contains error.
                             }
                         })
-                        console.log(formErrors)
-                        // response.payload.includes("birthYear") && console.log("bingo")
-                        dispatch(createNote(["Error creating user", "fail"]));
+                        dispatch(createNote([response.payload || "Error creating user", "fail"]));
                     } else {
                         setData(initialData);
                         dispatch(createNote(["User registered successfully!!", "success"]));
@@ -69,9 +64,6 @@ const SignUp = () => {
     // List of required fields
     const requiredFields = ["firstName", "lastName", "username", "password", "email", "birthYear"];
 
-    // Check if all required fields are filled
-    // const isFormValid = requiredFields.every(field => data[field].trim() !== "");
-
     // Helper to check if a field is missing
     const isFieldMissing = (field) => data[field].trim() === "";
 
@@ -86,8 +78,8 @@ const SignUp = () => {
 
     return (
         <>
-            {error && <p style={{ color: 'red' }}>Please fix wrong entries.</p>}
             <h1 className="center-align blue-text text-darken-3" style={{ marginTop: "40px" }}>Register</h1>
+            {error && <p className="center-align red-text text-darken-3" style={{ color: 'red' }}>Please fix wrong entries.</p>}
             <div className="row" style={{ marginTop: "30px", display: "flex", justifyContent: "center", alignItems: "center", minHeight: "70vh" }}>
                 <form
                     className="col s12 z-depth-2 white"
@@ -167,14 +159,15 @@ const SignUp = () => {
                                 placeholder="Year of birth"
                                 id="birthYear"
                                 type="text"
-                                className={`validate ${submitted && isFieldMissing("birthYear") ? "invalid" : ""}`}
+                                className={(formErrors.birthYear == true || (submitted && isFieldMissing("birthYear"))) ? "validate invalid" : "validate"}
                                 // {`validate ${submitted && isFieldMissing("birthYear") ? "invalid" : ""}`}
                                 // (formErrors.birthYear == true || (submitted && isFieldMissing("birthYear"))) ? "validate invalid" : "validate"
                                 onChange={handleChange}
                                 value={data.birthYear}
+                                required
                             />
                             <span className={`helper-text${submitted && isFieldMissing("birthYear") ? " red-text" : ""}`}>
-                                Required
+                                Required, {formErrors.birthYear && "must be a year"}
                             </span>
                         </div>
                     </div>

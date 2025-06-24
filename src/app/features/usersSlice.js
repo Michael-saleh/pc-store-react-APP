@@ -3,7 +3,6 @@ import axios from "axios";
 import { useSelector } from 'react-redux';
 
 const data_API = import.meta.env.VITE_data_API;
-// const data_API = "http://localhost:3000";
 
 export const getUsers = createAsyncThunk("users/getUsers", async (__, { rejectWithValue }) => {
     try {
@@ -43,11 +42,9 @@ export const postUser = createAsyncThunk("users/postUser",
     }
 );
 
-export const deleteUser = createAsyncThunk(
-    "users/deleteUser",
-    async (id, { getState, rejectWithValue }) => {
-        const state = getState();
-        const token = state.users.token;
+export const deleteUser = createAsyncThunk("users/deleteUser",
+    async (id, { rejectWithValue }) => {
+        const token = localStorage.getItem("token");
 
         try {
             const response = await axios.delete(`${data_API}/users/${id}`, {
@@ -58,8 +55,7 @@ export const deleteUser = createAsyncThunk(
 
             return response.data;
         } catch (error) {
-            console.log(error);
-            return rejectWithValue("Delete failed");
+            return rejectWithValue(error.response.data.message || "Delete failed");
         }
     }
 );
@@ -70,16 +66,19 @@ const usersSlice = createSlice({
     initialState: {
         data: [],
         status: "idle",
-        currentUser: null,
+        currentUser: typeof window !== "undefined" && localStorage.getItem('currentUser') !== "undefined"
+            ? JSON.parse(localStorage.getItem('currentUser'))
+            : null,
         error: null,
-        token: null
+        token: localStorage.getItem('token') || null
     },
 
     reducers: {
         logoutUser: (state) => {
             state.currentUser = null;
             state.token = null;
-            return state; // !!! ???
+            localStorage.removeItem('token');
+            localStorage.removeItem('currentUser');
         },
         resetError: (state) => {
             state.error = null;
@@ -92,10 +91,12 @@ const usersSlice = createSlice({
         builder
             .addCase(getUsers.pending, (state) => {
                 state.status = 'Loading';
+                state.error = null;
             })
             .addCase(getUsers.fulfilled, (state, action) => {
                 state.status = 'Succeeded';
                 state.data = action.payload;
+                state.error = null;
             })
             .addCase(getUsers.rejected, (state, action) => {
                 state.status = 'Failed';
@@ -109,9 +110,14 @@ const usersSlice = createSlice({
                 state.error = null;
             })
             .addCase(loginUser.fulfilled, (state, action) => {
+                state.error = null;
                 state.status = 'Succeeded';
                 state.currentUser = action.payload.user;
                 state.token = action.payload.token;
+                if (typeof window !== "undefined") {
+                    localStorage.setItem('currentUser', JSON.stringify(action.payload.user)); // Store as JSON
+                    localStorage.setItem('token', action.payload.token);
+                }
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.status = 'Failed';
@@ -122,9 +128,11 @@ const usersSlice = createSlice({
         builder
             .addCase(postUser.pending, (state) => {
                 state.status = 'Creating';
+                state.error = null;
             })
             .addCase(postUser.fulfilled, (state, action) => {
                 state.data.push(action.payload);
+                state.error = null;
             })
             .addCase(postUser.rejected, (state, action) => {
                 state.status = "Failed";
@@ -135,12 +143,15 @@ const usersSlice = createSlice({
         builder
             .addCase(deleteUser.pending, (state) => {
                 state.status = 'Deleting';
+                state.error = null;
             })
             .addCase(deleteUser.fulfilled, (state, action) => {
                 state.data = state.data.filter((user) => user._id !== action.payload);
+                state.error = null;
             })
-            .addCase(deleteUser.rejected, (state) => {
+            .addCase(deleteUser.rejected, (state, action) => {
                 state.status = 'Failed';
+                state.error = action.payload;
             })
     }
 });

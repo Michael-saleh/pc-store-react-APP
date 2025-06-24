@@ -48,7 +48,7 @@ const Navbar = () => {
                         <i className="material-icons">Menu</i>
                     </Link>
                     <ul id="nav-mobile" className="right hide-on-med-and-down">
-                        {(currentUser && currentUser.isAdmin) && <li>
+                        {(currentUser) && <li>
                             <Link to="/users" className="modern-link" style={{ textDecoration: "none" }}>Users</Link>
                         </li>}
 
