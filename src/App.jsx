@@ -11,7 +11,8 @@ import Signup from './components/signup';
 import Navbar from "./components/navBar";
 import Note from "./components/note";
 import Home from "./components/home";
-import Products from "./components/products"
+import Products from "./components/products";
+import UserProfile from "./components/userProfile";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -44,6 +45,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/products" element={<Products />} />
+        <Route path="/userProfile" element={<UserProfile />} />
         <Route path="/users" element={(currentUser && currentUser.isAdmin) ? (<Users />) : (<Login />)} />
       </Routes>
     </>

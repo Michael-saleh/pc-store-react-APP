@@ -13,6 +13,15 @@ export const getUsers = createAsyncThunk("users/getUsers", async (__, { rejectWi
     }
 })
 
+/* export const getUser = createAsyncThunk("users/getUser", async (id, { rejectWithValue }) => {
+    try {
+        const response = await axios.get(`${data_API}/users/${id}`);
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error.message);
+    }
+}) */
+
 export const loginUser = createAsyncThunk("users/loginUser", async (user, { rejectWithValue }) => {
     try {
         const response = await axios.post(`${data_API}/users/login`, user);

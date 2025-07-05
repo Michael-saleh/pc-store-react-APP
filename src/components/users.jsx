@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getUsers, deleteUser, logoutUser } from "../app/features/usersSlice";
-import { createNote } from "../app/features/noteSlice"
+import { createNote } from "../app/features/noteSlice";
 
 const Users = () => {
 

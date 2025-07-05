@@ -9,30 +9,23 @@ const Products = () => {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const currentUser = useSelector((state) => state.users.currentUser);
     const status = useSelector((state) => state.products.status);
     const error = useSelector((state) => state.products.error);
     const products = useSelector((state) => state.products.data);
 
     const handleDelete = async (id) => {
-        if (currentUser && currentUser.isAdmin == true) {
-            try {
-                const resultAction = await dispatch(deleteProduct(id));
-                if (deleteProduct.fulfilled.match(resultAction)) {
-                    dispatch(createNote(["Product deleted successfully", "success"]));
-                    dispatch(getProducts());
-                } else {
-                    dispatch(createNote(["Product delete failed, action not authorized", "fail"]));
-                }
-            }
-            catch (error) {
+        try {
+            const resultAction = await dispatch(deleteProduct(id));
+            if (deleteProduct.fulfilled.match(resultAction)) {
+                dispatch(createNote(["Product deleted successfully", "success"]));
+                dispatch(getProducts());
+            } else {
                 dispatch(createNote(["Product delete failed, action not authorized", "fail"]));
             }
-
-        } else {
+        }
+        catch (error) {
             dispatch(createNote(["Product delete failed, action not authorized", "fail"]));
         }
-
     };
 
     useEffect(() => {
@@ -47,7 +40,9 @@ const Products = () => {
 
     return (
         <>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            <div style={{ display: "flex", justifyContent: "center", marginTop: "50px" }}>
+                {error && <p style={{ color: 'red' }}>{error}</p>}
+            </div>
             {products.map(product => {
                 return (
                     <div
@@ -58,7 +53,7 @@ const Products = () => {
                         <div className={`card-content white-text`}>
                             <span className="card-title" style={{ fontWeight: "bold" }}>{product.name}</span>
                             <p>Category : {product.category}</p>
-                            <p>Quantity : {product.quantity}</p>
+center                            <p>Quantity : {product.quantity}</p>
                             <p>Price : {product.price}</p>
                             <p>Model number : {product.modelNumber}</p>
                             <p>Manifaturer : {product.manifaturer}</p>

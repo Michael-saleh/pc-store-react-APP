@@ -65,6 +65,9 @@ const Navbar = () => {
                                 <span className="modern-link" style={{ textDecoration: "none", display: "flex" }}><Link to="/login">Login</Link><span>/</span><Link to="/signup">signup</Link></span>
                             )}
                         </li>
+                        <li>
+                            {currentUser && <Link to="/userProfile" className="modern-link" style={{textDecoration: "none"}}>Profile</Link>}
+                        </li>
                     </ul>
                     <ul className="sidenav" id="mobile-demo">
                         <li>

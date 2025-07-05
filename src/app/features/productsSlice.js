@@ -31,20 +31,26 @@ export const postProduct = createAsyncThunk("products/postProduct",
 export const deleteProduct = createAsyncThunk(
     "products/deleteProduct",
     async (id, { rejectWithValue }) => {
-        const token = localStorage.getItem("token")
+        const token = localStorage.getItem("token");
+        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-        try {
-            const response = await axios.delete(`${data_API}/products/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+        if (currentUser && currentUser.isAdmin === true) {
+            try {
+                const response = await axios.delete(`${data_API}/products/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
 
-            return response.data;
-        } catch (error) {
-            console.log(error);
+                return response.data;
+            } catch (error) {
+                return rejectWithValue("Product delete failed");
+            }
+        } else {
             return rejectWithValue("Product delete failed");
         }
+
+
     }
 );
 
@@ -71,10 +77,12 @@ const usersSlice = createSlice({
         builder
             .addCase(getProducts.pending, (state) => {
                 state.status = 'Loading';
+                state.error = null;
             })
             .addCase(getProducts.fulfilled, (state, action) => {
                 state.status = 'Succeeded';
                 state.data = action.payload;
+                state.error = null;
             })
             .addCase(getProducts.rejected, (state, action) => {
                 state.status = 'Failed';
@@ -85,9 +93,11 @@ const usersSlice = createSlice({
         builder
             .addCase(postProduct.pending, (state) => {
                 state.status = 'Creating';
+                state.error = null;
             })
             .addCase(postProduct.fulfilled, (state, action) => {
                 state.data.push(action.payload);
+                state.error = null;
             })
             .addCase(postProduct.rejected, (state, action) => {
                 state.status = "Failed";
@@ -98,12 +108,15 @@ const usersSlice = createSlice({
         builder
             .addCase(deleteProduct.pending, (state) => {
                 state.status = 'Deleting';
+                state.error = null;
             })
             .addCase(deleteProduct.fulfilled, (state, action) => {
                 state.data = state.data.filter((product) => product._id !== action.payload);
+                state.error = null;
             })
-            .addCase(deleteProduct.rejected, (state) => {
+            .addCase(deleteProduct.rejected, (state, action) => {
                 state.status = 'Failed';
+                state.error = action.payload;
             })
     }
 });
