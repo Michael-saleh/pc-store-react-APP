@@ -2,9 +2,9 @@ import { useEffect } from 'react';
 import { Routes, Route } from 'react-router';
 import { useSelector, useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
+import { logoutUser } from "./app/features/usersSlice";
 import { createNote } from "./app/features/noteSlice";
-/* import './App.css';
-import './index.css'; */
+import { jwtDecode } from "jwt-decode";
 import Login from './components/login';
 import Users from './components/users';
 import Signup from './components/signup';
@@ -23,10 +23,21 @@ function App() {
   const location = useLocation();
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.users.currentUser);
+  const token = localStorage.getItem('token');
 
+  // Check if a token exists and valid, else reset currentUser and token.
+  useEffect(() => {
+    if (token) {
+      const decoded = jwtDecode(token);
+      const currentTime = Date.now() / 1000;
+      if (decoded.exp < currentTime) {
+        dispatch(logoutUser())
+      }
+    }
 
+  }, [])
 
-
+  // If none admin user try to access Users page, redirects to login page.
   useEffect(() => {
     if (!(currentUser && currentUser.isAdmin) && location.pathname === '/users') {
       dispatch(createNote(["Login as admin to access this page", "fail"]));

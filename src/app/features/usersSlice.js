@@ -13,15 +13,6 @@ export const getUsers = createAsyncThunk("users/getUsers", async (__, { rejectWi
     }
 })
 
-/* export const getUser = createAsyncThunk("users/getUser", async (id, { rejectWithValue }) => {
-    try {
-        const response = await axios.get(`${data_API}/users/${id}`);
-        return response.data;
-    } catch (error) {
-        return rejectWithValue(error.message);
-    }
-}) */
-
 export const loginUser = createAsyncThunk("users/loginUser", async (user, { rejectWithValue }) => {
     try {
         const response = await axios.post(`${data_API}/users/login`, user);
@@ -74,6 +65,31 @@ export const deleteUser = createAsyncThunk("users/deleteUser",
     }
 );
 
+export const editUser = createAsyncThunk("users/editUser",
+    async (data, { rejectWithValue }) => {
+        const token = localStorage.getItem("token");
+        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+        if (currentUser && currentUser.id == data.id) {
+
+            try {
+                const response = await axios.put(`${data_API}/users/${data.id}`, data.updates, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                return response.data;
+            } catch (error) {
+                return rejectWithValue("Failed to update user. 1");
+            }
+        } else {
+            return rejectWithValue("Failed to update user. 2");
+        }
+    }
+);
+
+
+
 const usersSlice = createSlice({
     name: 'users',
 
@@ -100,6 +116,23 @@ const usersSlice = createSlice({
     },
 
     extraReducers: (builder) => {
+
+        // Edit user
+
+        builder
+            .addCase(editUser.pending, (state) => {
+                state.status = 'Loading';
+                state.error = null;
+            })
+            .addCase(editUser.fulfilled, (state, action) => {
+                state.status = 'Succeeded';
+                state.currentUser = action.payload;
+                state.error = null;
+            })
+            .addCase(editUser.rejected, (state, action) => {
+                state.status = 'Failed';
+                state.error = action.payload;
+            });
 
         // fetch Users
         builder
