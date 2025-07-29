@@ -12,6 +12,7 @@ import Navbar from "./components/navBar";
 import Note from "./components/note";
 import Home from "./components/home";
 import Products from "./components/products";
+import AddProduct from "./components/addProduct";
 import UserProfile from "./components/userProfile";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -39,7 +40,7 @@ function App() {
 
   // If none admin user try to access Users page, redirects to login page.
   useEffect(() => {
-    if (!(currentUser && currentUser.isAdmin) && location.pathname === '/users') {
+    if (!(currentUser && currentUser.isAdmin) && (location.pathname === '/users' || location.pathname === '/products/add')) {
       dispatch(createNote(["Login as admin to access this page", "fail"]));
     }
   }, [location.pathname]);
@@ -56,6 +57,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/products" element={<Products />} />
+        <Route path="/products/add" element={(currentUser && currentUser.isAdmin) ? (<AddProduct />) : (<Login />)} />
         <Route path="/userProfile" element={<UserProfile />} />
         <Route path="/users" element={(currentUser && currentUser.isAdmin) ? (<Users />) : (<Login />)} />
       </Routes>

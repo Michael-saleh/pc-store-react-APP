@@ -15,8 +15,10 @@ export const getProducts = createAsyncThunk("products/getProducts", async (__, {
 
 export const postProduct = createAsyncThunk("products/postProduct",
     async (newProduct, { rejectWithValue }) => {
+        console.log("part reached")
         try {
             const response = await axios.post(`${data_API}/products`, newProduct);
+            console.log(response.data)
             return response.data;
         } catch (error) {
             // Handle both network errors and HTTP errors
@@ -55,8 +57,8 @@ export const deleteProduct = createAsyncThunk(
 );
 
 
-const usersSlice = createSlice({
-    name: 'users',
+const productsSlice = createSlice({
+    name: 'products',
 
     initialState: {
         data: [],
@@ -121,7 +123,7 @@ const usersSlice = createSlice({
     }
 });
 
-export const { resetError } = usersSlice.actions;
+export const { resetError } = productsSlice.actions;
 
 // Export reducer
-export default usersSlice.reducer;
+export default productsSlice.reducer;
